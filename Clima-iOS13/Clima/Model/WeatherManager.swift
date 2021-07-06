@@ -8,8 +8,15 @@
 
 import Foundation
 
+// Create protocol in the same class file it uses
+protocol WeatherManagerDelegate {
+    func didUpdateWeather(weather: WeatherModel)
+}
+
 struct WeatherManager {
     let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=e4d9b11cdefba5c2ba969fa75fea626e&units=metric"
+    
+    var delegate: WeatherManagerDelegate?
     
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)"
@@ -29,7 +36,10 @@ struct WeatherManager {
                 }
                 
                 if let safeData = data {
-                    self.parseJSON(weatherData: safeData)
+                    if let weather = self.parseJSON(weatherData: safeData) {
+                        // 특정한 vc와 얽히지 않고싶다. delegate 활용
+                        self.delegate?.didUpdateWeather(weather: weather)
+                    }
                 }
             }
             //4. Start the task
@@ -37,7 +47,7 @@ struct WeatherManager {
         }
     }
     
-    func parseJSON(weatherData: Data) {
+    func parseJSON(weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         do {
             let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
@@ -46,10 +56,10 @@ struct WeatherManager {
             let name = decodedData.name
             
             let weather = WeatherModel(conditionId: id, cityName: name, temparature: temp)
-            
-            print(weather.conditionName)
+            return weather
         } catch {
             print(error)
+            return nil
         }
     }
 }

@@ -14,7 +14,7 @@ struct WeatherModel {
     let temparature: Double
     
     var temparatureString: String {
-        return String(format: "%1f", temparature)
+        return String(format: "%.1f", temparature)
     }
     
     // computed property. always var

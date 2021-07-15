@@ -9,6 +9,12 @@
 import UIKit
 
 class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, CoinManagerDelegate {
+    func didUpdateCurrency(coin: Double, currency: String) {
+        DispatchQueue.main.async {
+            self.bitcoinLabel.text = String(format: "%.2f", coin)
+            self.currencyLabel.text = currency
+        }
+    }
     
     func didFailWithError(_ coinManager: CoinManager, error: Error) {
         print(error)

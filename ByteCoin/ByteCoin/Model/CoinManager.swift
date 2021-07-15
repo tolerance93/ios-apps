@@ -9,6 +9,7 @@
 import Foundation
 
 protocol CoinManagerDelegate {
+    func didUpdateCurrency(coin: Double, currency: String)
     func didFailWithError(_ coinManager: CoinManager, error: Error)
 }
 
@@ -23,11 +24,6 @@ struct CoinManager {
     
     func getCoinPrice(for currency: String) {
         let urlString = "\(baseURL)/\(currency)?apikey=\(apiKey)"
-        performRequest(with: urlString)
-    }
-    
-    func performRequest(with urlString: String) {
-        //1. Create URL
         if let url = URL(string: urlString) {
             //2. Create a URL Session
             let session = URLSession(configuration: .default)
@@ -40,7 +36,7 @@ struct CoinManager {
                 if let safeData = data {
                     if let coin = self.parseJSON(safeData) {
                         // 특정한 vc와 얽히지 않고싶다. delegate 활용
-                        print(coin)
+                        delegate?.didUpdateCurrency(coin: coin, currency: currency)
                     }
                 }
             }
